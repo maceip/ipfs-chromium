@@ -38,6 +38,8 @@ constexpr std::size_t CAR_RESPONSE_BUFFER_SIZE = 5UL * 1024UL * 1024UL;
  */
 class GatewayRequest : public std::enable_shared_from_this<GatewayRequest> {
  public:
+  /*! Type for callbacks for when bytes are received
+   */
   using BytesReceivedHook =
       std::function<void(std::string_view, ByteView, ipld::BlockSource const&)>;
 
@@ -79,6 +81,9 @@ class GatewayRequest : public std::enable_shared_from_this<GatewayRequest> {
   std::string debug_string() const;
   void orchestrator(std::shared_ptr<Partition> const&);
   bool cachable() const;
+
+  /*! @return The part of the path that functions as an origin (the second component)
+   */
   std::string_view root_component() const;
   void root_component(std::string_view);
 

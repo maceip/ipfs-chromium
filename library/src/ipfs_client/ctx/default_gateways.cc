@@ -33,14 +33,14 @@ auto ctx::LoadGatewaysFromEnvironmentVariable(ipfs::ctx::GatewayConfig& cfg) -> 
 
 void ctx::LoadStaticGatewayList(ipfs::ctx::GatewayConfig& cfg) {
   auto static_list = {
-      std::pair<std::string_view, int>{"http://127.0.0.1:8080/", 1039},
-      {"https://ipfs.io/", 1009},
-      {"https://dweb.link/", 946},
-      {"https://trustless-gateway.link/", 942},
-      {"https://hardbin.com/", 918},
-      {"https://ipfs.greyh.at/", 862},
-      {"https://ipfs.joaoleitao.org/", 856},
-      {"https://dlunar.net/", 697},
+      std::pair<std::string_view, int>{"http://127.0.0.1:8080/", 1040},
+      {"https://ipfs.io/", 1007},
+      {"https://dweb.link/", 944},
+      {"https://trustless-gateway.link/", 941},
+      {"https://hardbin.com/", 916},
+      {"https://ipfs.greyh.at/", 861},
+      {"https://ipfs.joaoleitao.org/", 854},
+      {"https://dlunar.net/", 695},
       {"https://flk-ipfs.io/", 681},
       {"https://ipfs.cyou/", 474},
       {"https://human.mypinata.cloud/", 415},

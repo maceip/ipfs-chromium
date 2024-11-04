@@ -114,6 +114,8 @@ TEST_F(GatewayRequestTest, accept_param) {
   EXPECT_EQ(t_.accept(), "");
   t_.type = RT::Zombie;
   EXPECT_EQ(t_.accept(), "");
+  t_.type = RT::DnsLink;
+  EXPECT_EQ(t_.accept(), "application/vnd.ipld.raw");
 }
 TEST_F(GatewayRequestTest, timeouts_ordinal) {
  EXPECT_LT(timeout(RT::Identity), timeout(RT::DnsLink));
