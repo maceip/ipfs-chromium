@@ -29,7 +29,7 @@ except Exception as ex:
     verbose('Installed requests because of', ex)
 
 
-VERSION_CLOSE_ENOUGH = 30121
+VERSION_CLOSE_ENOUGH = 30122
 LARGE_INT = 9876543210
 here = dirname(__file__)
 
