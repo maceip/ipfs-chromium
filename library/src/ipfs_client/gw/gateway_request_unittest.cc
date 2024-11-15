@@ -71,8 +71,7 @@ struct GatewayRequestTest : public testing::Test {
 
 TEST_F(GatewayRequestTest, RespondsToCar) {
   LogRecorder lr;
-  t_.cid =
-      i::Cid{"bafybeibwfakyszctcz54dungqay7jae35agjjhokltvvtboospgo6napxy"};
+  t_.cid(i::Cid{"bafybeibwfakyszctcz54dungqay7jae35agjjhokltvvtboospgo6napxy"});
   t_.type = RT::Car;
   auto p = reinterpret_cast<char const*>(a_car.data());
   EXPECT_FALSE(orc->has_key(
