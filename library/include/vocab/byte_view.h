@@ -19,6 +19,11 @@ inline ByteView as_bytes(ContiguousBytes const& b) {
   auto p = reinterpret_cast<ipfs::Byte const*>(b.data());
   return ByteView{p, b.size()};
 }
+template <class ContiguousBytes>
+inline span<std::uint8_t const> as_octets(ContiguousBytes const& b) {
+  auto p = reinterpret_cast<std::uint8_t const*>(b.data());
+  return {p, b.size()};
+}
 }  // namespace ipfs
 
 #endif  // CHROMIUM_IPFS_BYTE_VIEW_H

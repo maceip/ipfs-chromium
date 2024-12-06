@@ -164,7 +164,7 @@ void ipfs::IpfsUrlLoader::BlocksComplete(std::string mime_type,
   }
   auto byte_count = static_cast<PipeByteCount>(partial_block_.size());
 #if SPAN_ARG
-  pipe_prod_->WriteData(base::as_bytes(base::make_span(partial_block_)),
+  pipe_prod_->WriteData(ipfs::as_octets(partial_block_),
                         MOJO_BEGIN_WRITE_DATA_FLAG_ALL_OR_NONE,
                         byte_count);
 #else

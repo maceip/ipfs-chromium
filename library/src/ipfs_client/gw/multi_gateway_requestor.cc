@@ -190,7 +190,7 @@ void Self::HandleResponse(HttpRequestDescription const& desc,
     }
     if (req->RespondSuccessfully(body, api_, src, roots)) {
       if (gw.find("ipfs.eth.aragon.network") < gw.size()) {
-        LOG(INFO) << "Success on " << desc.url;
+        VLOG(2) << "Success on " << desc.url;
       }
       if (state_.end() != i) {
         i->second.hit(req_type, *req);
