@@ -54,7 +54,7 @@ void Self::request(ReqPtr req) {
     case HandleOutcome::PENDING:
       break;
     case HandleOutcome::DONE:
-      VLOG(2) << req->debug_string() << " finished synchronously: " << name();
+      // VLOG(2) << req->debug_string() << " finished synchronously: " << name();
       break;
   }
 }
