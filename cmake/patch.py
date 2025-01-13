@@ -29,7 +29,7 @@ except ModuleNotFoundError as ex:
     verbose('Installed requests because of', ex)
 
 
-VERSION_CLOSE_ENOUGH = 30123
+VERSION_CLOSE_ENOUGH = 30124
 LARGE_INT = 9876543210
 here = dirname(__file__)
 
@@ -535,9 +535,9 @@ if __name__ == "__main__":
         for chan in ["Dev", "Beta", "Stable", "Extended"]:
             for osn in ["Linux", "Mac", "Windows"]:
                 rels = per.release_versions(chan, osn)
-                for (step_desc,verinf) in zip(['Cur', 'Prv', 'Old'], rels):
+                for (step_desc, verinf) in zip(['Cur', 'Prv', 'Old'], rels):
                     print(f"{verinf[1]:15} {step_desc} {chan:9}{os:7}")
-        for (elec_br,chrom_ver) in per.electron_versions().items():
+        for (elec_br, chrom_ver) in per.electron_versions().items():
             print(f"{chrom_ver:15} Electron {elec_br}")
         print(f"{per.electron_version():15} Electron main")
         o = per.oldest()

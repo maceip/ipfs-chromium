@@ -159,8 +159,9 @@ auto ipfs::PbDag::cid() const -> Cid const& {
 auto ipfs::PbDag::LinkCid(ipfs::ByteView binary_link_hash) const -> std::string {
   Cid const result(binary_link_hash);
   if (!result.valid()) {
-    LOG(FATAL) << "Failed to decode link CID as binary ( link from "
+    LOG(ERROR) << "Failed to decode link CID as binary ( link from "
                << cid().to_string() << ")";
+    return {};
   }
   auto str_res = result.to_string();
   if (str_res.empty()) {
