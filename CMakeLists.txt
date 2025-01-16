@@ -44,8 +44,6 @@ include(shell)
 
 enable_testing()
 
-add_subdirectory(library)
-
 if(IS_DIRECTORY "${CHROMIUM_SOURCE_TREE}")
     add_subdirectory(component)
 elseif(CHROMIUM_SOURCE_TREE AND DOWNLOAD_CHROMIUM)
