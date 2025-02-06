@@ -83,14 +83,6 @@ void ipfs::IpfsUrlLoader::SetPriority(net::RequestPriority /*priority*/,
   // TODO implement
 }
 
-void ipfs::IpfsUrlLoader::PauseReadingBodyFromNet() {
-  NOTIMPLEMENTED();
-}
-
-void ipfs::IpfsUrlLoader::ResumeReadingBodyFromNet() {
-  NOTIMPLEMENTED();
-}
-
 void ipfs::IpfsUrlLoader::StartRequest(
     std::shared_ptr<IpfsUrlLoader> me,
     network::ResourceRequest const& resource_request,
