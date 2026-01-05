@@ -1,10 +1,14 @@
 #ifndef IPFS_BLOCK_HTTP_REQUEST_H_
 #define IPFS_BLOCK_HTTP_REQUEST_H_
 
+#include <services/network/public/cpp/simple_url_loader.h>
+
 #include <ipfs_client/gw/gateway_request.h>
 
 #include <ipfs_client/ctx/http_api.h>
 #include <vocab/raw_ptr.h>
+
+#include <type_traits>
 
 namespace network {
 struct ResourceRequest;
@@ -17,6 +21,18 @@ class URLResponseHead;
 class GURL;
 
 namespace ipfs {
+
+
+using BodyAsString = std::conditional<
+  std::is_same<
+      network::SimpleURLLoader::BodyAsStringCallback,
+      base::OnceCallback<void(std::optional<std::string>)>
+    >::value,
+    std::optional<std::string>,
+    std::unique_ptr<std::string>
+    >::type;
+
+static_assert(std::is_same<BodyAsString, std::optional<std::string>>::value);
 
 /*! Manages lifetime for a single HTTP request to an IPFS gateway.
  *  Not strictly for a block necessarily, thought that was the case when the name was chosen.
@@ -48,7 +64,7 @@ class BlockHttpRequest : public std::enable_shared_from_this<BlockHttpRequest> {
 
   void OnResponseHead(GURL const&, network::mojom::URLResponseHead const&);
   void OnResponse(std::shared_ptr<BlockHttpRequest>,
-                  std::unique_ptr<std::string> body);
+                  BodyAsString body);
 };
 }  // namespace ipfs
 

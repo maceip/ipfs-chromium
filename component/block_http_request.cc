@@ -1,6 +1,5 @@
 #include "block_http_request.h"
 #include <services/network/public/cpp/resource_request.h>
-#include <services/network/public/cpp/simple_url_loader.h>
 #include <services/network/public/mojom/url_response_head.mojom.h>
 #include <base/strings/string_number_conversions.h>
 
@@ -55,7 +54,7 @@ void Self::Send(raw_ptr<network::mojom::URLLoaderFactory> loader_factory) {
   }
 }
 void Self::OnResponse(std::shared_ptr<Self>,
-                      std::unique_ptr<std::string> body) {
+                      BodyAsString body) {
   DCHECK(loader_);
   int status;
   switch (loader_->NetError()) {
@@ -80,7 +79,7 @@ void Self::OnResponse(std::shared_ptr<Self>,
       status = 0;
     }
   }
-  if (body) {
+  if (!!body) {
     callback_(status, *body, header_accessor_);
   } else {
     callback_(status, "", header_accessor_);

@@ -3,6 +3,7 @@
 #include "chromium_ipfs_context.h"
 #include "inter_request_state.h"
 
+#include <base/functional/callback_helpers.h>
 #include <base/timer/timer.h>
 #include <net/http/http_response_headers.h>
 

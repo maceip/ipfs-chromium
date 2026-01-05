@@ -13,4 +13,3 @@
   - IPNS recursion limit
 ## Dev QoL
   - Docker builds verifying every documented build approach
-  - library published in Conan

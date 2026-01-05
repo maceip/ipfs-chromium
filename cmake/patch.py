@@ -29,7 +29,7 @@ except ModuleNotFoundError as ex:
     verbose('Installed requests because of', ex)
 
 
-VERSION_CLOSE_ENOUGH = 30317
+VERSION_CLOSE_ENOUGH = 30318
 OOD_GRACE_PERIOD = VERSION_CLOSE_ENOUGH * 23
 MONTHS_OF_SUPPORT = 14
 LARGE_INT = 9876543210
@@ -229,7 +229,7 @@ class Patcher:
                         join(self.csrc, src),
                         ") with",
                         patch_path,
-                        f"try\ngit difftool {self.__closest_by_git()}.ic ",
+                        f"try\ngit -C {self.csrc} difftool {self.__closest_by_git()}.ic ",
                         src
                     )
                     sys.exit(8)
@@ -525,7 +525,11 @@ class Patcher:
                 print(p)
 
 
+chromium_src_dir: str | None = None
+
+
 def list_releases():
+    assert chromium_src_dir is not None
     per = Patcher(chromium_src_dir, "git", "Debug")
     for chan in ["Dev", "Beta", "Stable", "Extended"]:
         for osn in ["Linux", "Mac", "Windows"]:

@@ -176,7 +176,7 @@ void ipfs::IpfsUrlLoader::BlocksComplete(std::string mime_type,
     LOG(ERROR) << "\n\tFailed to create headers!\n";
     return;
   }
-  auto* reason =
+  auto reason =
       net::GetHttpReasonPhrase(static_cast<net::HttpStatusCode>(status_));
   auto status_line = base::StringPrintf("HTTP/1.1 %d %s", status_, reason);
   head->headers->ReplaceStatusLine(status_line);
