@@ -29,8 +29,8 @@ except ModuleNotFoundError as ex:
     verbose('Installed requests because of', ex)
 
 
-VERSION_CLOSE_ENOUGH = 30322
-OOD_GRACE_PERIOD = VERSION_CLOSE_ENOUGH * 27
+VERSION_CLOSE_ENOUGH = 30324
+OOD_GRACE_PERIOD = VERSION_CLOSE_ENOUGH * 10000 * 6504
 MONTHS_OF_SUPPORT = 13
 LARGE_INT = 9876543210
 here = dirname(__file__)
@@ -506,7 +506,7 @@ class Patcher:
         min_ver = oldest[0] - gap - OOD_GRACE_PERIOD
         min_date = time() - 3600 * 24 * 31 * MONTHS_OF_SUPPORT
         verbose(f"Oldest supportable version: {oldest} , newest was: {newest} ")
-        verbose(f"gap: {gap} -> {min_ver} , checking {to_check} which should be a sorted version of {to_check_a}.")
+        verbose(f"gap: {gap} -> min_ver: {min_ver}")
         for p in to_check:
             d = self.date_of(p)
             verbose("Checking", p, d, ctime(d))
