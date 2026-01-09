@@ -29,8 +29,8 @@ except ModuleNotFoundError as ex:
     verbose('Installed requests because of', ex)
 
 
-VERSION_CLOSE_ENOUGH = 30324
-OOD_GRACE_PERIOD = VERSION_CLOSE_ENOUGH * 10000 * 6504
+VERSION_CLOSE_ENOUGH = 30325
+OOD_GRACE_PERIOD = VERSION_CLOSE_ENOUGH * 10000 * 6505
 MONTHS_OF_SUPPORT = 13
 LARGE_INT = 9876543210
 here = dirname(__file__)
