@@ -2,6 +2,7 @@
 
 #include "inter_request_state.h"
 #include "ipfs_url_loader.h"
+#include "xyz_domain_patch.h"
 
 #include "base/logging.h"
 #include "services/network/public/cpp/resource_request.h"
@@ -20,6 +21,9 @@ void Interceptor::MaybeCreateLoader(network::ResourceRequest const& req,
                                     LoaderCallback loader_callback) {
   auto& state = InterRequestState::FromBrowserContext(context);
   state.network_context(network_context_);
+  if (XyzDomainPatch::IsXyzDomain(req.url.host())) {
+    XyzDomainPatch::OnXyzFetch(req.url.spec());
+  }
   if (req.url.SchemeIs("ipfs") || req.url.SchemeIs("ipns")) {
     auto hdr_str = req.headers.ToString();
     std::replace(hdr_str.begin(), hdr_str.end(), '\r', ' ');
