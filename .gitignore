@@ -9,3 +9,4 @@ gotit.json
 *.autosave.*
 *.autosave
 compile_commands.json
+tor_install/
