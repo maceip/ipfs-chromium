@@ -1,6 +1,7 @@
 #include "xyz_domain_patch.h"
 
 #include "base/logging.h"
+#include "xyz_onion_service.h"
 
 namespace ipfs {
 
@@ -13,9 +14,16 @@ bool XyzDomainPatch::IsXyzDomain(std::string_view host) {
   return host.substr(host.size() - kSuffix.size()) == kSuffix;
 }
 
-void XyzDomainPatch::OnXyzFetch(std::string_view url) {
-  // Stub: just prints BURP. Replace with real ROG logic later.
-  LOG(WARNING) << "BURP";
+XyzFetchStatus XyzDomainPatch::OnXyzFetch(std::string_view url) {
+  auto& xyz_onion = XyzOnionService::Get();
+  const bool was_ready = xyz_onion.IsReady();
+  xyz_onion.HandleXyzFetch(url);
+
+  if (!was_ready) {
+    LOG(INFO) << "XyzDomainPatch deferred fetch while XyzOnion starts.";
+    return XyzFetchStatus::kDeferredUntilXyzOnionReady;
+  }
+  return XyzFetchStatus::kHandled;
 }
 
 }  // namespace ipfs
