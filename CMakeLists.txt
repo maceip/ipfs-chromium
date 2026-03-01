@@ -30,6 +30,12 @@ set(TEST_BY_DEFAULT FALSE CACHE BOOL "Update unit tests as part of the 'all' def
 set(USE_CLANG_TIDY FALSE CACHE BOOL "Use clang-tidy, if found, to generate additional warnings.")
 set(USE_DOXYGEN TRUE CACHE BOOL "If we should attempt to use Doxygen to generate documentation, if it's available.")
 set(BRANDING_DIR "${CMAKE_CURRENT_LIST_DIR}/branding" CACHE PATH "Directory conataining branding files to synchronize. If empty, don't apply any branding changes.")
+set(TOR_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tor" CACHE PATH
+    "Path to the Tor source tree (maceip/Tor).  Used to build the tor binary for onion service support."
+)
+set(TOR_BINARY "" CACHE FILEPATH
+    "Path to a pre-built tor binary.  If empty, the build will attempt to compile Tor from TOR_SOURCE_DIR."
+)
 #End of user-configuration cache variables.
 
 if(CXX_VERSION GREATER_EQUAL 20)
@@ -54,6 +60,34 @@ else()
 endif()
 
 add_subdirectory(electron-spin)
+
+# --- Tor onion service support (maceip/Tor) ---
+if(IS_DIRECTORY "${TOR_SOURCE_DIR}")
+  # Build tor from source using autotools.
+  include(ExternalProject)
+  ExternalProject_Add(tor_build
+    SOURCE_DIR "${TOR_SOURCE_DIR}"
+    CONFIGURE_COMMAND "${TOR_SOURCE_DIR}/configure"
+        "--prefix=${CMAKE_BINARY_DIR}/tor_install"
+        "--disable-asciidoc"
+        "--disable-manpage"
+        "--disable-html-manual"
+        "--disable-module-relay"
+    BUILD_COMMAND make -j4
+    INSTALL_COMMAND make install
+    BUILD_IN_SOURCE FALSE
+    LOG_CONFIGURE TRUE
+    LOG_BUILD TRUE
+  )
+  set(TOR_BINARY_RESOLVED "${CMAKE_BINARY_DIR}/tor_install/bin/tor")
+  message(STATUS "Tor will be built from source: ${TOR_SOURCE_DIR}")
+elseif(TOR_BINARY)
+  set(TOR_BINARY_RESOLVED "${TOR_BINARY}")
+  message(STATUS "Using pre-built Tor binary: ${TOR_BINARY}")
+else()
+  set(TOR_BINARY_RESOLVED "")
+  message(STATUS "Tor onion service support: tor binary will be resolved from PATH at runtime.")
+endif()
 
 include(cmake/doxy.cmake)
 include(cmake/marp.cmake)

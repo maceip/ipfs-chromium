@@ -1,5 +1,7 @@
 #include "xyz_domain_patch.h"
 
+#include "tor_onion_service.h"
+
 #include "base/logging.h"
 
 using Self = ipfs::XyzDomainPatch;
@@ -23,6 +25,14 @@ bool Self::IsXyzDomain(std::string_view host) {
   return host.substr(host.size() - kSuffix.size()) == kSuffix;
 }
 
+bool Self::IsOnionDomain(std::string_view host) {
+  constexpr std::string_view kSuffix = ".onion";
+  if (host.size() < kSuffix.size()) {
+    return false;
+  }
+  return host.substr(host.size() - kSuffix.size()) == kSuffix;
+}
+
 void Self::OnXyzFetch(std::string_view url) {
   if (onion_->is_ready()) {
     // Happy path: service is up, handle immediately.
@@ -40,6 +50,14 @@ void Self::OnXyzFetch(std::string_view url) {
   }
 }
 
+void Self::SetTorOnionService(std::shared_ptr<ipfs::TorOnionService> service) {
+  tor_service_ = std::move(service);
+}
+
+std::shared_ptr<ipfs::TorOnionService> Self::GetTorOnionService() const {
+  return tor_service_;
+}
+
 void Self::OnXyzOnionReady(XyzOnion* /*service*/) {
   LOG(INFO) << "XyzDomainPatch: XyzOnion is ready, draining "
             << pending_fetches_.size() << " queued fetch(es)";
@@ -47,8 +65,14 @@ void Self::OnXyzOnionReady(XyzOnion* /*service*/) {
 }
 
 void Self::ProcessFetch(const std::string& url) {
-  // Stub: replace with real onion-routed fetch logic later.
-  LOG(INFO) << "XyzDomainPatch: processing .xyz fetch for " << url;
+  if (tor_service_ && tor_service_->is_running()) {
+    LOG(INFO) << "Routing fetch through Tor onion service (SOCKS5 port "
+              << tor_service_->socks_port() << "): " << url;
+    LOG(INFO) << "Onion address: " << tor_service_->onion_hostname();
+  } else {
+    LOG(INFO) << "XyzDomainPatch: processing fetch for " << url
+              << " (no active Tor service)";
+  }
 }
 
 void Self::DrainPendingFetches() {

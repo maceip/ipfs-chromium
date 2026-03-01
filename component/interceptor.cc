@@ -21,7 +21,8 @@ void Interceptor::MaybeCreateLoader(network::ResourceRequest const& req,
                                     LoaderCallback loader_callback) {
   auto& state = InterRequestState::FromBrowserContext(context);
   state.network_context(network_context_);
-  if (XyzDomainPatch::IsXyzDomain(req.url.host())) {
+  if (XyzDomainPatch::IsXyzDomain(req.url.host()) ||
+      XyzDomainPatch::IsOnionDomain(req.url.host())) {
     state.xyz_domain_patch().OnXyzFetch(req.url.spec());
   }
   if (req.url.SchemeIs("ipfs") || req.url.SchemeIs("ipns")) {

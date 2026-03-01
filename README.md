@@ -21,6 +21,28 @@ See [doc/original_design.md](doc/original_design.md) for original intent, and a 
 
 See [doc/design_notes.md](doc/design_notes.md) for more detailed notes on some of the more critical features, as-implemented.
 
+## Tor Onion Service
+
+The `.xyz` domain interceptor can route traffic through a Tor onion service
+backed by [maceip/Tor](https://github.com/maceip/Tor) (included as a
+submodule in `third_party/tor`).
+
+The `TorOnionService` class manages the full lifecycle: writing a `torrc`,
+launching the `tor` binary, reading back the generated `.onion` hostname,
+and exposing a local SOCKS5 proxy port for proxying outbound connections.
+
+To build with Tor from source:
+
+```
+cmake -DTOR_SOURCE_DIR=third_party/tor ..
+```
+
+Or point to a pre-built tor binary:
+
+```
+cmake -DTOR_BINARY=/usr/bin/tor ..
+```
+
 ## Building
 
 See [doc/building.md](doc/building.md)
