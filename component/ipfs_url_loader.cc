@@ -10,6 +10,7 @@
 
 #include "base/check_version_internal.h"
 #include "base/debug/stack_trace.h"
+#include "base/notimplemented.h"
 #include "base/notreached.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/bind_post_task.h"
@@ -83,14 +84,6 @@ void ipfs::IpfsUrlLoader::SetPriority(net::RequestPriority /*priority*/,
   // TODO implement
 }
 
-void ipfs::IpfsUrlLoader::PauseReadingBodyFromNet() {
-  NOTIMPLEMENTED();
-}
-
-void ipfs::IpfsUrlLoader::ResumeReadingBodyFromNet() {
-  NOTIMPLEMENTED();
-}
-
 void ipfs::IpfsUrlLoader::StartRequest(
     std::shared_ptr<IpfsUrlLoader> me,
     network::ResourceRequest const& resource_request,
@@ -108,7 +101,12 @@ void ipfs::IpfsUrlLoader::StartRequest(
     auto ns = resource_request.url.scheme();
     auto cid_str = resource_request.url.host();
     auto path = resource_request.url.path();
-    auto abs_path = "/" + ns + "/" + cid_str + path;
+    std::string abs_path = "/";
+    abs_path.append(ns)
+            .append("/")
+            .append(cid_str)
+            .append(path)
+            ;
     me->root_ = cid_str;
     me->api_->with(
         std::make_unique<ChromiumHttp>(*(me->lower_loader_factory_)));
@@ -164,7 +162,7 @@ void ipfs::IpfsUrlLoader::BlocksComplete(std::string mime_type,
   }
   auto byte_count = static_cast<PipeByteCount>(partial_block_.size());
 #if SPAN_ARG
-  pipe_prod_->WriteData(base::as_bytes(base::make_span(partial_block_)),
+  pipe_prod_->WriteData(ipfs::as_octets(partial_block_),
                         MOJO_BEGIN_WRITE_DATA_FLAG_ALL_OR_NONE,
                         byte_count);
 #else
@@ -203,8 +201,10 @@ void ipfs::IpfsUrlLoader::BlocksComplete(std::string mime_type,
     auto ri = net::RedirectInfo::ComputeRedirectInfo(
         "GET", GURL{original_url_}, net::SiteForCookies{},
         net::RedirectInfo::FirstPartyURLPolicy::UPDATE_URL_ON_REDIRECT,
-        net::ReferrerPolicy::NO_REFERRER, "", status_, GURL{resp_loc_},
-        std::nullopt, false);
+        net::ReferrerPolicy::NO_REFERRER,
+        "", //original_referrer
+        std::nullopt, //original_initiator
+        status_, GURL{resp_loc_}, std::nullopt, false);
     client_->OnReceiveRedirect(ri, std::move(head));
   } else {
     client_->OnReceiveResponse(std::move(head), std::move(pipe_cons_),
