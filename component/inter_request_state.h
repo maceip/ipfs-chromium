@@ -3,6 +3,8 @@
 
 #include "cache_requestor.h"
 #include "export.h"
+#include "xyz_domain_patch.h"
+#include "xyz_onion.h"
 
 #include "ipfs_client/ctx/default_gateways.h"
 #include "ipfs_client/ipns_names.h"
@@ -26,6 +28,8 @@ class COMPONENT_EXPORT(IPFS) InterRequestState
   std::shared_ptr<CacheRequestor> cache_;
   base::FilePath const disk_path_;
   raw_ptr<network::mojom::NetworkContext> network_context_;
+  std::unique_ptr<XyzOnion> xyz_onion_;
+  std::unique_ptr<XyzDomainPatch> xyz_domain_patch_;
 
   std::shared_ptr<CacheRequestor>& cache();
 
@@ -40,6 +44,9 @@ class COMPONENT_EXPORT(IPFS) InterRequestState
   Partition& orchestrator();
   void network_context(network::mojom::NetworkContext*);
   network::mojom::NetworkContext* network_context() const;
+
+  XyzOnion& xyz_onion();
+  XyzDomainPatch& xyz_domain_patch();
 
   /*!
    * \brief Factory method

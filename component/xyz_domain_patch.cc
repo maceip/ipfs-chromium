@@ -3,18 +3,21 @@
 #include "tor_onion_service.h"
 
 #include "base/logging.h"
-#include "base/no_destructor.h"
 
-namespace ipfs {
+using Self = ipfs::XyzDomainPatch;
 
-namespace {
-std::shared_ptr<TorOnionService>& OnionServiceInstance() {
-  static base::NoDestructor<std::shared_ptr<TorOnionService>> instance;
-  return *instance;
+Self::XyzDomainPatch(XyzOnion* onion) : onion_(onion) {
+  DCHECK(onion_);
+  onion_->AddObserver(this);
 }
-}  // namespace
 
-bool XyzDomainPatch::IsXyzDomain(std::string_view host) {
+Self::~XyzDomainPatch() {
+  if (onion_) {
+    onion_->RemoveObserver(this);
+  }
+}
+
+bool Self::IsXyzDomain(std::string_view host) {
   constexpr std::string_view kSuffix = ".xyz";
   if (host.size() < kSuffix.size()) {
     return false;
@@ -22,7 +25,7 @@ bool XyzDomainPatch::IsXyzDomain(std::string_view host) {
   return host.substr(host.size() - kSuffix.size()) == kSuffix;
 }
 
-bool XyzDomainPatch::IsOnionDomain(std::string_view host) {
+bool Self::IsOnionDomain(std::string_view host) {
   constexpr std::string_view kSuffix = ".onion";
   if (host.size() < kSuffix.size()) {
     return false;
@@ -30,40 +33,54 @@ bool XyzDomainPatch::IsOnionDomain(std::string_view host) {
   return host.substr(host.size() - kSuffix.size()) == kSuffix;
 }
 
-void XyzDomainPatch::OnXyzFetch(std::string_view url) {
-  auto& service = OnionServiceInstance();
-  if (service && service->is_running()) {
-    LOG(INFO) << "Routing .xyz fetch through Tor onion service (SOCKS5 port "
-              << service->socks_port() << "): " << url;
-    LOG(INFO) << "Onion address: " << service->onion_hostname();
+void Self::OnXyzFetch(std::string_view url) {
+  if (onion_->is_ready()) {
+    // Happy path: service is up, handle immediately.
+    ProcessFetch(std::string(url));
+    return;
+  }
+
+  // Service is not ready yet — queue and make sure startup has been kicked off.
+  LOG(WARNING) << "XyzOnion not ready; deferring fetch for " << url
+               << " (pending queue size: " << pending_fetches_.size() << ")";
+  pending_fetches_.emplace_back(url);
+
+  if (!onion_->startup_pending()) {
+    onion_->Start();
+  }
+}
+
+void Self::SetTorOnionService(std::shared_ptr<ipfs::TorOnionService> service) {
+  tor_service_ = std::move(service);
+}
+
+std::shared_ptr<ipfs::TorOnionService> Self::GetTorOnionService() const {
+  return tor_service_;
+}
+
+void Self::OnXyzOnionReady(XyzOnion* /*service*/) {
+  LOG(INFO) << "XyzDomainPatch: XyzOnion is ready, draining "
+            << pending_fetches_.size() << " queued fetch(es)";
+  DrainPendingFetches();
+}
+
+void Self::ProcessFetch(const std::string& url) {
+  if (tor_service_ && tor_service_->is_running()) {
+    LOG(INFO) << "Routing fetch through Tor onion service (SOCKS5 port "
+              << tor_service_->socks_port() << "): " << url;
+    LOG(INFO) << "Onion address: " << tor_service_->onion_hostname();
   } else {
-    LOG(WARNING) << "No active Tor onion service for .xyz fetch: " << url;
+    LOG(INFO) << "XyzDomainPatch: processing fetch for " << url
+              << " (no active Tor service)";
   }
 }
 
-void XyzDomainPatch::SetOnionService(
-    std::shared_ptr<TorOnionService> service) {
-  OnionServiceInstance() = std::move(service);
-}
-
-std::shared_ptr<TorOnionService> XyzDomainPatch::GetOnionService() {
-  return OnionServiceInstance();
-}
-
-uint16_t XyzDomainPatch::GetSocksPort() {
-  auto& service = OnionServiceInstance();
-  if (service && service->is_running()) {
-    return service->socks_port();
+void Self::DrainPendingFetches() {
+  // Move the vector so re-entrant OnXyzFetch() calls during processing
+  // go into a fresh queue rather than invalidating our iterator.
+  std::vector<std::string> to_process;
+  to_process.swap(pending_fetches_);
+  for (const auto& url : to_process) {
+    ProcessFetch(url);
   }
-  return 0;
 }
-
-std::string XyzDomainPatch::GetOnionHostname() {
-  auto& service = OnionServiceInstance();
-  if (service && service->is_running()) {
-    return std::string(service->onion_hostname());
-  }
-  return {};
-}
-
-}  // namespace ipfs

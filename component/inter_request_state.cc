@@ -80,8 +80,25 @@ Self::InterRequestState(base::FilePath p, PrefService* prefs)
     : api_{CreateContext(*this, prefs)}, disk_path_{p} {
   api_->with(std::make_unique<JsonParserAdapter>());
   DCHECK(prefs);
+
+  // Boot the XyzOnion service eagerly — it takes 10s–2min to become ready,
+  // so we want the clock ticking as soon as the profile is created.
+  xyz_onion_ = std::make_unique<XyzOnion>();
+  xyz_onion_->Start();
+
+  // XyzDomainPatch observes XyzOnion readiness and queues deferred fetches.
+  xyz_domain_patch_ = std::make_unique<XyzDomainPatch>(xyz_onion_.get());
 }
 Self::~InterRequestState() noexcept {
+  // Tear down observers before the service they observe.
+  xyz_domain_patch_.reset();
+  xyz_onion_.reset();
   network_context_ = nullptr;
   cache_.reset();
+}
+ipfs::XyzOnion& Self::xyz_onion() {
+  return *xyz_onion_;
+}
+ipfs::XyzDomainPatch& Self::xyz_domain_patch() {
+  return *xyz_domain_patch_;
 }
