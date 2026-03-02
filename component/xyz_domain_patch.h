@@ -6,6 +6,8 @@
 
 namespace ipfs {
 
+class InterRequestState;
+
 enum class XyzFetchStatus {
   kHandled,
   kDeferredUntilXyzOnionReady,
@@ -21,7 +23,8 @@ class XyzDomainPatch {
 
   // Called when a .xyz domain fetch is intercepted.
   // Requests are deferred while XyzOnion is warming up.
-  static XyzFetchStatus OnXyzFetch(std::string_view url);
+  static XyzFetchStatus OnXyzFetch(InterRequestState& state,
+                                   std::string_view url);
 };
 
 }  // namespace ipfs

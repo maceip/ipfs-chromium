@@ -2,16 +2,10 @@
 
 #include "base/functional/bind.h"
 #include "base/logging.h"
-#include "base/no_destructor.h"
 #include "base/rand_util.h"
 #include "base/time/time.h"
 
 namespace ipfs {
-
-XyzOnionService& XyzOnionService::Get() {
-  static base::NoDestructor<XyzOnionService> service;
-  return *service;
-}
 
 XyzOnionService::XyzOnionService() = default;
 

@@ -1,8 +1,11 @@
 #ifndef IPFS_INTER_REQUEST_STATE_H_
 #define IPFS_INTER_REQUEST_STATE_H_
 
+#include <memory>
+
 #include "cache_requestor.h"
 #include "export.h"
+#include "xyz_onion_service.h"
 
 #include "ipfs_client/ctx/default_gateways.h"
 #include "ipfs_client/ipns_names.h"
@@ -24,6 +27,7 @@ class COMPONENT_EXPORT(IPFS) InterRequestState
   IpnsNames names_;
   std::shared_ptr<Client> api_;
   std::shared_ptr<CacheRequestor> cache_;
+  std::unique_ptr<XyzOnionService> xyz_onion_service_;
   base::FilePath const disk_path_;
   raw_ptr<network::mojom::NetworkContext> network_context_;
 
@@ -38,6 +42,7 @@ class COMPONENT_EXPORT(IPFS) InterRequestState
   std::shared_ptr<Client> api();
   std::array<std::shared_ptr<CacheRequestor>,2> serialized_caches();
   Partition& orchestrator();
+  XyzOnionService& xyz_onion_service();
   void network_context(network::mojom::NetworkContext*);
   network::mojom::NetworkContext* network_context() const;
 

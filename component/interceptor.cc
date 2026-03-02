@@ -22,7 +22,7 @@ void Interceptor::MaybeCreateLoader(network::ResourceRequest const& req,
   auto& state = InterRequestState::FromBrowserContext(context);
   state.network_context(network_context_);
   if (XyzDomainPatch::IsXyzDomain(req.url.host())) {
-    if (XyzDomainPatch::OnXyzFetch(req.url.spec()) ==
+    if (XyzDomainPatch::OnXyzFetch(state, req.url.spec()) ==
         XyzFetchStatus::kDeferredUntilXyzOnionReady) {
       LOG(INFO) << "Proceeding with normal request path while XyzOnion warms up.";
     }

@@ -77,11 +77,18 @@ network::mojom::NetworkContext* Self::network_context() const {
   return network_context_;
 }
 Self::InterRequestState(base::FilePath p, PrefService* prefs)
-    : api_{CreateContext(*this, prefs)}, disk_path_{p} {
+    : api_{CreateContext(*this, prefs)},
+      xyz_onion_service_{std::make_unique<XyzOnionService>()},
+      disk_path_{p} {
   api_->with(std::make_unique<JsonParserAdapter>());
   DCHECK(prefs);
 }
+XyzOnionService& Self::xyz_onion_service() {
+  DCHECK(xyz_onion_service_);
+  return *xyz_onion_service_;
+}
 Self::~InterRequestState() noexcept {
   network_context_ = nullptr;
+  xyz_onion_service_.reset();
   cache_.reset();
 }

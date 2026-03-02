@@ -12,8 +12,6 @@ namespace ipfs {
 
 class XyzOnionService {
  public:
-  static XyzOnionService& Get();
-
   XyzOnionService(const XyzOnionService&) = delete;
   XyzOnionService& operator=(const XyzOnionService&) = delete;
 
