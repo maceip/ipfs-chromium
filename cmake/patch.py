@@ -143,6 +143,10 @@ class Patcher:
         return out == path
 
     def __closest_by_git(self):
+        for direct in [self.tag_name(), self.git(["rev-parse", "--abbrev-ref", "HEAD"], Result.Output)]:
+            if direct in self.available():
+                verbose("Direct edits version is", direct)
+                return direct
         win = ""
         win_dist = LARGE_INT
         for ref in self.available():
